@@ -1,0 +1,98 @@
+### 1. Entidades
+
+- **ALUNO** 
+
+- **PLANO_DE_ASSINATURA** 
+
+- **INSTRUTORES** 
+
+- **CARTÃO_DE_ACESSO**
+
+
+### 2. Atributos e chaves primárias
+
+**ALUNO**
+
+- id_aluno (PK)
+
+- nome 
+
+- CPF 
+
+- telefone 
+
+- email 
+
+**PLANO_DE_ASSINATURA**
+
+- id_plano (PK) 
+
+- nome_plano 
+
+- valor 
+
+- duração 
+
+**INSTRUTOR**
+
+- id_instrutor (PK) 
+
+- nome 
+
+- CPF 
+
+- telefone 
+
+- especialidade
+
+**CARTÃO_DE_ACESSO**
+
+- id_cartao (PK)
+
+- codigo_cartao
+
+- data_emissao
+
+- status
+
+
+### 3. Relacionamentos e cardinalidades
+
+#### **PLANO_DE_ASSINATURA — ALUNO**
+
+**1:N**
+
+Um plano pode ter vários alunos, enquanto cada aluno possui um plano.
+
+```
+PLANO_DE_ASSINATURA 1 ───── N ALUNO
+```
+
+#### **INSTRUTOR — ALUNO**
+
+**N:N**
+
+Um instrutor pode acompanhar vários alunos, e um aluno pode ter vários instrutores.
+
+```
+INSTRUTOR N ───── N ALUNO
+```
+
+#### **ALUNO — CARTÃO_DE_ACESSO**
+
+**1:1**
+
+- Um aluno possui um cartão de acesso. 
+
+- Um cartão de acesso pertence a um único aluno. 
+
+```
+ALUNO 1 ───── 1 CARTÃO_DE_ACESSO
+```
+
+
+- **1:1** → Aluno e Cartão de Acesso 
+
+- **1:N** → Plano de Assinatura e Alunos 
+
+- **N:N** → Instrutores e Alunos
