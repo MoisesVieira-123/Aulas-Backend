@@ -1,0 +1,258 @@
+# Projeto Banco de Dados
+
+## Descrição
+
+Este projeto tem como objetivo implementar um banco de dados para gerenciamento de alunos, cursos, professores e matrículas.
+
+O banco de dados foi desenvolvido utilizando PostgreSQL e possui as seguintes tabelas:
+
+* `aluno`
+* `curso`
+* `professor`
+* `matricula`
+
+A tabela `matricula` relaciona um aluno, um curso e um professor.
+
+---
+
+## Estrutura do Banco de Dados
+
+### Aluno
+
+A tabela `aluno` armazena os dados dos alunos.
+
+* `id`: chave primária do aluno.
+* `nome`: nome do aluno.
+* `idade`: idade do aluno.
+* `RA`: registro acadêmico do aluno.
+
+### Curso
+
+A tabela `curso` armazena os cursos disponíveis.
+
+* `id`: chave primária do curso.
+* `nome_curso`: nome do curso.
+
+### Professor
+
+A tabela `professor` armazena os dados dos professores.
+
+* `id`: chave primária do professor.
+* `nome_professor`: nome do professor.
+
+### Matrícula
+
+A tabela `matricula` registra as matrículas realizadas.
+
+* `id_matricula`: chave primária da matrícula.
+* `id_aluno`: chave estrangeira que referencia `aluno(id)`.
+* `id_curso`: chave estrangeira que referencia `curso(id)`.
+* `id_professor`: chave estrangeira que referencia `professor(id)`.
+* `data_matricula`: data em que a matrícula foi realizada.
+
+---
+
+# Normalização até a Terceira Forma Normal (3FN)
+
+A normalização foi aplicada com o objetivo de reduzir a duplicidade de informações e evitar problemas de inserção, alteração e exclusão de dados.
+
+## Primeira Forma Normal (1FN)
+
+Para atender à 1FN, os atributos devem possuir valores atômicos, ou seja, cada campo deve armazenar apenas um valor.
+
+Em uma estrutura não normalizada, poderíamos ter uma tabela contendo informações como:
+
+```text
+MATRICULA
+id_matricula
+nome_aluno
+idade_aluno
+RA
+nome_curso
+nome_professor
+data_matricula
+```
+
+Cada atributo possui apenas um valor por registro, evitando grupos de dados repetidos dentro de uma mesma coluna.
+
+Além disso, cada registro possui uma identificação única por meio de uma chave primária.
+
+Dessa forma, a estrutura atende à Primeira Forma Normal.
+
+---
+
+## Segunda Forma Normal (2FN)
+
+A 2FN exige que a tabela esteja na 1FN e que não existam dependências parciais.
+
+Uma dependência parcial ocorre quando um atributo depende apenas de parte de uma chave primária composta.
+
+No modelo desenvolvido, as informações foram separadas de acordo com a entidade à qual pertencem.
+
+Os dados do aluno foram colocados na tabela `aluno`:
+
+```text
+aluno
+id → nome
+id → idade
+id → RA
+```
+
+Os dados do curso foram colocados na tabela `curso`:
+
+```text
+curso
+id → nome_curso
+```
+
+Os dados do professor foram colocados na tabela `professor`:
+
+```text
+professor
+id → nome_professor
+```
+
+A tabela `matricula` mantém os dados próprios da matrícula e as chaves estrangeiras responsáveis pelos relacionamentos.
+
+Como as tabelas possuem chaves primárias simples, não existem dependências parciais em relação a uma chave composta.
+
+---
+
+## Terceira Forma Normal (3FN)
+
+A 3FN exige que a tabela esteja na 2FN e que não existam dependências transitivas entre atributos que não sejam a chave primária.
+
+Uma dependência transitiva ocorreria, por exemplo, se tivéssemos:
+
+```text
+id_matricula → id_curso → nome_curso
+```
+
+e armazenássemos `nome_curso` diretamente na tabela `matricula`.
+
+Nesse caso, o nome do curso não dependeria diretamente da matrícula, mas sim do curso.
+
+Para evitar essa dependência, o nome do curso foi armazenado na tabela `curso`:
+
+```text
+curso
+id → nome_curso
+```
+
+O mesmo princípio foi aplicado ao professor. Em vez de armazenar `nome_professor` diretamente em `matricula`, a informação fica na tabela `professor`:
+
+```text
+professor
+id → nome_professor
+```
+
+A tabela `matricula` armazena somente a chave estrangeira:
+
+```text
+matricula.id_professor → professor.id
+```
+
+Dessa forma, o nome do professor depende de `professor.id`, e não diretamente de `matricula.id_matricula`.
+
+O mesmo ocorre com o aluno:
+
+```text
+matricula.id_aluno → aluno.id
+```
+
+As informações do aluno permanecem na tabela `aluno`:
+
+```text
+aluno
+id → nome
+id → idade
+id → RA
+```
+
+Assim, informações que dependem de aluno, curso ou professor não são armazenadas novamente na tabela de matrícula.
+
+---
+
+# Relacionamentos
+
+Os relacionamentos entre as tabelas são realizados por meio das chaves estrangeiras.
+
+```text
+ALUNO 1 ───── N MATRICULA N ───── 1 CURSO
+                    |
+                    |
+                    N
+                    |
+                    1
+               PROFESSOR
+```
+
+Os relacionamentos podem ser descritos da seguinte forma:
+
+* **Aluno → Matrícula:** um aluno pode possuir várias matrículas, enquanto cada matrícula pertence a um aluno.
+* **Curso → Matrícula:** um curso pode possuir várias matrículas, enquanto cada matrícula está relacionada a um curso.
+* **Professor → Matrícula:** um professor pode estar relacionado a várias matrículas, enquanto cada matrícula possui um professor associado.
+
+Na tabela `matricula`, esses relacionamentos são implementados pelas seguintes chaves estrangeiras:
+
+```text
+matricula.id_aluno → aluno.id
+matricula.id_curso → curso.id
+matricula.id_professor → professor.id
+```
+
+---
+
+# Integridade dos Dados
+
+Foram utilizadas restrições de integridade para garantir a consistência dos dados.
+
+### PRIMARY KEY
+
+As chaves primárias identificam exclusivamente cada registro:
+
+* `aluno.id`
+* `curso.id`
+* `professor.id`
+* `matricula.id_matricula`
+
+### FOREIGN KEY
+
+As chaves estrangeiras garantem que os relacionamentos entre as tabelas sejam válidos:
+
+* `matricula.id_aluno` → `aluno.id`
+* `matricula.id_curso` → `curso.id`
+* `matricula.id_professor` → `professor.id`
+
+### NOT NULL
+
+Utilizado nos campos que não devem aceitar valores nulos, como nomes e identificadores necessários.
+
+### UNIQUE
+
+Utilizado para evitar duplicidade em informações como:
+
+* `aluno.nome`
+* `aluno.RA`
+* `curso.nome_curso`
+* `professor.nome_professor`
+
+### CHECK
+
+Utilizado para garantir que a idade do aluno não seja negativa.
+
+### DEFAULT
+
+Utilizado na data da matrícula para preencher automaticamente a data atual quando nenhuma data for informada.
+
+---
+
+# Conclusão
+
+A aplicação da normalização até a Terceira Forma Normal permitiu separar as informações de alunos, cursos e professores de seus respectivos relacionamentos com as matrículas.
+
+A estrutura reduz a duplicidade de dados, elimina dependências parciais e transitivas e facilita a manutenção das informações.
+
+O relacionamento entre `professor` e `matricula` é realizado por meio da chave estrangeira `matricula.id_professor`, que referencia `professor.id`.
+
+O uso de chaves primárias, chaves estrangeiras e restrições de integridade também garante maior consistência e organização dos dados no banco de dados.
